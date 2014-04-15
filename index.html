@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>What Precedence?</title>
+    <meta name="description" content="c precedence online tool">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="parser.min.js"></script>
+    <script>
+      window.onload = function() {
+        var output1 = document.getElementById('output1');
+        var output2 = document.getElementById('output2');
+        var expression = document.getElementById('expression')
+
+        function go() {
+          while (output1.lastChild) output1.removeChild(output1.lastChild);
+          while (output2.lastChild) output2.removeChild(output2.lastChild);
+          var res = parse_c(expression.value);
+          output1.appendChild(document.createTextNode(res[0]));
+          output2.appendChild(document.createTextNode(res[1]));
+        }
+
+        expression.addEventListener('change', go);
+        expression.value = '1 + 2 + 3 * 4 / 2 + 3 == 5';
+        go();
+      };
+    </script>
+  </head>
+
+  <body>
+    <input type="text" id="expression" style="width: 400px"></input>
+    <pre id="output1"></pre>
+    <pre id="output2"></pre>
+  </body>
+</html>
