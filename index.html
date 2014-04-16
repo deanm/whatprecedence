@@ -26,7 +26,6 @@
     <script src="parser.min.js"></script>
     <script>
       function process(res, output, show_opt) {
-        while (output.lastChild) output.removeChild(output.lastChild);
         var spans = [ ];
         for (var i = 0, il = res.length; i < il; ++i) {
           var t = res[i];
@@ -68,7 +67,6 @@
       var start_expression = '+x+x+++x++';
 
       function on_hash_change() {
-        console.trace('on_hash_change');
         var hash = window.location.hash.substr(1);
         if (hash.length >= 2 && hash.substr(0, 2) === 'e=') {
           var expr = decodeURIComponent(hash.substr(2));
@@ -81,7 +79,18 @@
       function gogo(expr) {
         var output1 = document.getElementById('output1');
         var output2 = document.getElementById('output2');
-        var res = parse_c(expr);
+        while (output1.lastChild) output1.removeChild(output1.lastChild);
+        while (output2.lastChild) output2.removeChild(output2.lastChild);
+        var res;
+        try {
+          res = parse_c(expr);
+        } catch(e) {
+          var span = document.createElement('span');
+          span.style.color = 'red';
+          span.appendChild(document.createTextNode('Error: ' + e));
+          output2.appendChild(span);
+          return;
+        }
         process(res, output1, true);
         process(res, output2, false);
       }
