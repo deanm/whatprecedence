@@ -63,23 +63,42 @@
         //output2.appendChild(document.createTextNode(res[1]));
       }
 
-      window.onload = function() {
+      window.onhashchange = on_hash_change;
+
+      var start_expression = '+x+x+++x++';
+
+      function on_hash_change() {
+        console.trace('on_hash_change');
+        var hash = window.location.hash.substr(1);
+        if (hash.length >= 2 && hash.substr(0, 2) === 'e=') {
+          var expr = decodeURIComponent(hash.substr(2));
+          var expression_node = document.getElementById('expression');
+          expression_node.value = expr;
+          gogo(expr);
+        }
+      }
+
+      function gogo(expr) {
         var output1 = document.getElementById('output1');
         var output2 = document.getElementById('output2');
-        var expression = document.getElementById('expression')
+        var res = parse_c(expr);
+        process(res, output1, true);
+        process(res, output2, false);
+      }
 
-        var kPal = ['#FFCB5D', '#FF9594'];
+      window.onload = function() {
+        var expression = document.getElementById('expression');
 
         function go() {
-          var res = parse_c(expression.value);
-          process(res, output1, true);
-          process(res, output2, false);
+          var expr = expression.value;
+          window.location.hash = '#e=' + encodeURIComponent(expr);
+          gogo(expr);
         }
 
         expression.addEventListener('change', go);
-        //expression.value = '1 + 2 + 3 * 4 / 2 + 3 == 5';
-        expression.value = '+x+x+++x++';
-        go();
+        expression.value = start_expression;
+        gogo(start_expression);  // Don't update hash.
+        on_hash_change();
       };
     </script>
   </head>
