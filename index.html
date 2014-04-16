@@ -12,6 +12,7 @@
       }
       input {
         font-size: 16pt;
+        margin-bottom: 20px;
       }
       div#output1, div#output2 {
         cursor: default;
@@ -19,25 +20,28 @@
         font-family: monospace;
         white-space: pre;
         margin-left: 20px;
-        margin-bottom: 10px;
+        margin-bottom: 15px;
       }
     </style>
     <script src="parser.min.js"></script>
     <script>
-      function process(res, output) {
+      function process(res, output, show_opt) {
         while (output.lastChild) output.removeChild(output.lastChild);
         var spans = [ ];
         for (var i = 0, il = res.length; i < il; ++i) {
           var t = res[i];
           var span = document.createElement('span');
-          span.appendChild(document.createTextNode(t.text));
           spans.push(span);
+          if (t.opt === true && show_opt !== true) continue;
+
+          if (t.desc) span.title = t.desc;
+          span.appendChild(document.createTextNode(t.text));
           output.appendChild(span);
+
           (function(t, span) {
             if (t.type.substr(0, 3) !== 'op_') return;
             span.addEventListener('mouseover', function(e) {
               span.style.color = 'blue';
-              console.log(t);
               for (var i = 1, il = t.p.length; i < il; i += 2) {
                 for (var j = t.p[i-1], jl = t.p[i]; j < jl; ++j) {
                   //spans[j].style.backgroundColor = kPal[i>>1];
@@ -68,8 +72,8 @@
 
         function go() {
           var res = parse_c(expression.value);
-          process(res[0], output1);
-          process(res[1], output2);
+          process(res, output1, true);
+          process(res, output2, false);
         }
 
         expression.addEventListener('change', go);
