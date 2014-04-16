@@ -6,19 +6,70 @@
     <title>What Precedence?</title>
     <meta name="description" content="c precedence online tool">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+      html, body {
+        font-size: 18pt;
+      }
+      input {
+        font-size: 16pt;
+      }
+      div#output1, div#output2 {
+        cursor: default;
+        display: block;
+        font-family: monospace;
+        white-space: pre;
+        margin-left: 20px;
+        margin-bottom: 10px;
+      }
+    </style>
     <script src="parser.min.js"></script>
     <script>
+      function process(res, output) {
+        while (output.lastChild) output.removeChild(output.lastChild);
+        var spans = [ ];
+        for (var i = 0, il = res.length; i < il; ++i) {
+          var t = res[i];
+          var span = document.createElement('span');
+          span.appendChild(document.createTextNode(t.text));
+          spans.push(span);
+          output.appendChild(span);
+          (function(t, span) {
+            if (t.type.substr(0, 3) !== 'op_') return;
+            span.addEventListener('mouseover', function(e) {
+              span.style.color = 'blue';
+              console.log(t);
+              for (var i = 1, il = t.p.length; i < il; i += 2) {
+                for (var j = t.p[i-1], jl = t.p[i]; j < jl; ++j) {
+                  //spans[j].style.backgroundColor = kPal[i>>1];
+                  //spans[j].style.color = 'red';
+                  spans[j].style.borderBottom = '1px solid black';
+                  //spans[j].style.textDecoration = 'underline';
+                }
+              }
+            });
+            span.addEventListener('mouseout', function(e) {
+              for (var i = 0, il = spans.length; i < il; ++i) {
+                spans[i].style.color = '';
+                spans[i].style.borderBottom = '';
+                //spans[i].style.textDecoration = '';
+              }
+            });
+          })(t, span);
+        }
+        //output2.appendChild(document.createTextNode(res[1]));
+      }
+
       window.onload = function() {
         var output1 = document.getElementById('output1');
         var output2 = document.getElementById('output2');
         var expression = document.getElementById('expression')
 
+        var kPal = ['#FFCB5D', '#FF9594'];
+
         function go() {
-          while (output1.lastChild) output1.removeChild(output1.lastChild);
-          while (output2.lastChild) output2.removeChild(output2.lastChild);
           var res = parse_c(expression.value);
-          output1.appendChild(document.createTextNode(res[0]));
-          output2.appendChild(document.createTextNode(res[1]));
+          process(res[0], output1);
+          process(res[1], output2);
         }
 
         expression.addEventListener('change', go);
@@ -30,8 +81,11 @@
   </head>
 
   <body>
-    <input type="text" id="expression" style="width: 400px"></input>
-    <pre id="output1"></pre>
-    <pre id="output2"></pre>
+    <input type="text" id="expression" style="width: 600px"></input>
+    <div></div>
+    <div>Full Parentheses:</div>
+    <div id="output1"></div>
+    <div>Minimal Parentheses:</div>
+    <div id="output2"></div>
   </body>
 </html>
