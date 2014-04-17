@@ -83,7 +83,8 @@
         while (output2.lastChild) output2.removeChild(output2.lastChild);
         var res;
         try {
-          res = parse_c(expr);
+          var tree = build_ast(new CLexer(expr));
+          var res = generate_blocks(tree);
         } catch(e) {
           var span = document.createElement('span');
           span.style.color = 'red';
